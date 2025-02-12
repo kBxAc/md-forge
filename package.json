@@ -1,6 +1,6 @@
 {
   "name": "md-forge",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "Simplest markdown to html converter that ever existed",
   "main": "index.js",
   "bin": {

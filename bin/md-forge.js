@@ -8,6 +8,7 @@ try {
     const md = fs.readFileSync(INPUT_FILE_PATH, 'utf8');
     const parsedMd = parseMarkdown(md);
     fs.writeFileSync(OUTPUT_FILE_PATH, parsedMd);
+    console.info(`Successfully saved to ${OUTPUT_FILE_PATH}.`);
 } catch (error) {
     console.error("An error occurred while parsing the markdown file");
     console.error(error);

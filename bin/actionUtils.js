@@ -4,10 +4,10 @@ import fs from 'fs';
 const help = (exitCode = 0) => {
     console.log("Usage: md-forge [--help|--version|--input <input file>|--output <output file>]");
     console.log("Options:");
-    console.log("  --help     Show help");
-    console.log("  --version  Show version number");
-    console.log("  --input    Input file path");
-    console.log("  --output   Output file path");
+    console.log("  --help, -h       Show help");
+    console.log("  --version, -v    Show version number");
+    console.log("  --input, -i      Input file path");
+    console.log("  --output, -o     Output file path");
     console.log();
     version();
     process.exit(exitCode);
@@ -20,7 +20,7 @@ const version = () => {
 
 const input = (filePath) => {
     if (!fs.existsSync(filePath)) {
-        console.error("File does not exist");
+        console.error("File does not exist", filePath);
         help(1);
     } else {
         return true;
@@ -28,12 +28,7 @@ const input = (filePath) => {
 };
 
 const output = (filePath) => {
-    if (!fs.existsSync(filePath)) {
-        console.error("File does not exist");
-        help(1);
-    } else {
-        return true;
-    }
+    return true;
 };
 
 export {

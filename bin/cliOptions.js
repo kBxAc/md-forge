@@ -1,24 +1,30 @@
 import { help, version, input, output } from "./actionUtils.js";
 
-var INPUT_FILE_PATH = null;
-var OUTPUT_FILE_PATH = null;
-
-const ACTIONS = ["--help", "--version", "--input", "--output"];
+const ACTIONS = [
+    "--help", "--version", "--input", "--output",
+    "-h", "-v", "-i", "-o"
+];
 
 const cliActions = {
     "--help": help,
+    "-h": help,
     "--version": version,
+    "-v": version,
     "--input": input,
+    "-i": input,
     "--output": output,
+    "-o": output,
 };
 
 const parseCliOptions = (args) => {
+    var INPUT_FILE_PATH = null;
+    var OUTPUT_FILE_PATH = null;
+    
     // check which actions are present
     let actions = args.filter(arg => ACTIONS.includes(arg));
     if (actions.length === 0) {
         help(1);
     }
-    console.log(actions);
 
     // Prioritize actions
     // 1. --help
@@ -26,13 +32,15 @@ const parseCliOptions = (args) => {
     // 3. --input
     // 4. --output
 
-    if (actions.includes("--help")) {
+    if (actions.includes("--help") || actions.includes("-h")) {
         help();
-    } else if (actions.includes("--version")) {
+    } else if (actions.includes("--version") || actions.includes("-v")) {
         version();
-    } else if (actions.includes("--input")) {
+    } else if (actions.includes("--input") || actions.includes("-i")) {
         // get the file path
         let index = args.indexOf("--input");
+        if (index === -1) index = args.indexOf("-i");
+
         if (index === args.length - 1) {
             console.error("No input file path provided");
             help(1);
@@ -41,16 +49,22 @@ const parseCliOptions = (args) => {
         if (input(filePath)) {
             INPUT_FILE_PATH = filePath;
         }
-    } else if (actions.includes("--output")) {
-        // get the file path
-        let index = args.indexOf("--output");
-        if (index === args.length - 1) {
-            console.error("No output file path provided");
-            help(1);
-        }
-        const filePath = args[index + 1];
-        if (output(filePath)) {
-            OUTPUT_FILE_PATH = filePath;
+
+        // Check for output file
+        if (actions.includes("--output") || actions.includes("-o")) {
+            // get the file path
+            let index = args.indexOf("--output");
+            if (index === -1) index = args.indexOf("-o");
+
+            if (index === args.length - 1) {
+                console.error("No output file path provided");
+                help(1);
+            }
+            const filePath = args[index + 1];
+            
+            if (output(filePath)) {
+                OUTPUT_FILE_PATH = filePath;
+            }
         }
     }
 

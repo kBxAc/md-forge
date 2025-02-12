@@ -1,5 +1,9 @@
 // Priority of elements in md-forge markdown while parsing:
-// 0. Code blocks
+// 
+// 0A. ```Code blocks```
+// 0AB. `Inline Code` // todo
+// 0B. Image Link blocks // syntax [![Alt Text](image.png)](https://example.com)
+// 0C. Basic Link blocks // syntax [Link Text](https://example.com "Example Tooltip")
 //
 // 1. # h1
 // 2. ## h2
@@ -22,12 +26,24 @@
 // 15. <sup>superscript text</sup> no need to parse
 // 16. <ins>underline text</ins> no need to parse
 
-const CODE_PLACEHOLDER = "%%CODE_BLOCK%%";
+
+// Placeholders
+const CODE_PLACEHOLDER = "%%CODEBLOCK%%";
+const BASICLINK_PLACEHOLDER = "%%BASICLINKBLOCK%%";
+const IMAGELINK_PLACEHOLDER = "%%IMAGELINKBLOCK%%";
+
+// Placeholder data
 let codeBlocks = [];
+let basicLinkBlocks = [];
+let imageLinkBlocks = [];
 
 export function parseMarkdown(md) {
     // parse code blocks and store them safely
     md = parseCodeBlocks(md);
+
+    // parse basic link and image link blocks and store them safely
+    md = parseImageLinkBlocks(md);
+    md = parseBasicLinkBlocks(md);
 
     // parse headings
     md = parseHeadings(md);
@@ -35,7 +51,10 @@ export function parseMarkdown(md) {
     // parse styled text
     md = parseStyledText(md);
 
-    // restore code blocks
+    // restore blocks
+    md = restoreBasicLinkBlocks(md);
+    md = restoreImageLinkBlocks(md);
+
     md = restoreCodeBlocks(md);
 
     return md;
@@ -76,5 +95,36 @@ function restoreCodeBlocks(md) {
     return md.replace(new RegExp(CODE_PLACEHOLDER, "g"), () => {
         let { lang, code } = codeBlocks[index++];
         return `<pre><code class="${lang}" lang="${lang}">${code}</code></pre>`;
+    });
+}
+
+function parseBasicLinkBlocks(md) {
+    return md.replace(/\[(.*?)\]\((\S+)(?:\s+"(.*?)")?\s?\)/g, (match, text, url, tooltip = "") => {
+        basicLinkBlocks.push({ text, url, tooltip });
+        return BASICLINK_PLACEHOLDER;
+    })
+}
+
+function restoreBasicLinkBlocks(md) {
+    let index = 0;
+    return md.replace(new RegExp(BASICLINK_PLACEHOLDER, "g"), () => {
+        let { text, url, tooltip } = basicLinkBlocks[index++];
+        return `<a href="${url}" title="${tooltip}">${text}</a>`;
+    });
+}
+
+function parseImageLinkBlocks(md) {
+    return md.replace(/\[!\[(.*?)\]\((.*?)\)\s*?\]\((.*?)\)/gm, (match, alt, src, href) => {
+        if (!href) href = "#";
+        imageLinkBlocks.push({ alt, src, href });
+        return IMAGELINK_PLACEHOLDER;
+    })
+}
+
+function restoreImageLinkBlocks(md) {
+    let index = 0;
+    return md.replace(new RegExp(IMAGELINK_PLACEHOLDER, "g"), () => {
+        let { alt, src, href } = imageLinkBlocks[index++];
+        return `<a href="${href}"><img alt="${alt}" src="${src}"></a>`;
     });
 }
