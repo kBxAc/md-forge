@@ -1,0 +1,13 @@
+{
+  "name": "md-forge",
+  "version": "1.0.0-beta.1",
+  "description": "Simplest markdown to html converter that ever existed",
+  "main": "index.js",
+  "bin": {
+    "md-forge": "./bin/md-forge.js"
+  },
+  "type": "module",
+  "keywords": [],
+  "author": "ayushch80",
+  "license": "ISC"
+}
